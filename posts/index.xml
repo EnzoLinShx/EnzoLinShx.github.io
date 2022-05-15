@@ -13,7 +13,12 @@
       <pubDate>Tue, 26 Mar 2019 08:47:11 +0100</pubDate>
       
       <guid>https://EnzoLinShx.github.io/posts/murmur_001/</guid>
-      <description></description>
+      <description>OpenCart处理页面的基础原理是：
+对于路由为&amp;lt;parentCategory&amp;gt;/&amp;lt;pageName&amp;gt;的页面
+ ./catalog/view/theme/&amp;lt;youTheme&amp;gt;/template/&amp;lt;parentCategory&amp;gt;/&amp;lt;pageName&amp;gt;.twig文件包含HTML模版 ./catalog/view/language/&amp;lt;languageCode&amp;gt;/&amp;lt;parentCategory&amp;gt;/&amp;lt;pageName&amp;gt;.php包含本地化翻译 ./catalog/model/&amp;lt;parentCategory&amp;gt;/&amp;lt;actionName&amp;gt;.php包含操作数据库的定义  最终，当请求页面时，./catalog/controller/&amp;lt;parentCategory&amp;gt;/&amp;lt;pageName&amp;gt;.php负责整合以上3个文件的逻辑，返回特定的HTML文件。
+然而，奇怪的是，common/home，也就是主页的路由，它的controller文件少了读取本地化翻译的指令，默认情况下无法通过直接修改上述文件完成多语言页面修改，只能通过拓展插件的形式达到目的。
+解决的方法也很简单，在./catalog/controller/common/home.php加入下述代码即可：
+$this-&amp;gt;load-&amp;gt;language(&amp;#39;common/home&amp;#39;); </description>
     </item>
     
   </channel>
