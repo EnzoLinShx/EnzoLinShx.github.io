@@ -70,8 +70,8 @@ $this-&gt;load-&gt;language(&#39;common/home&#39;); ">
 $this-&gt;load-&gt;language(&#39;common/home&#39;); " />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://EnzoLinShx.github.io/posts/murmur_001/" /><meta property="article:section" content="posts" />
-<meta property="article:published_time" content="2019-03-26T08:47:11&#43;01:00" />
-<meta property="article:modified_time" content="2019-03-26T08:47:11&#43;01:00" />
+<meta property="article:published_time" content="2022-05-14T08:47:11&#43;01:00" />
+<meta property="article:modified_time" content="2022-05-14T08:47:11&#43;01:00" />
 
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Murmur 001"/>
@@ -116,8 +116,8 @@ $this-&gt;load-&gt;language(&#39;common/home&#39;); "/>
   "articleBody": "OpenCart处理页面的基础原理是：\n对于路由为/的页面\n ./catalog/view/theme//template//.twig文件包含HTML模版 ./catalog/view/language///.php包含本地化翻译 ./catalog/model//.php包含操作数据库的定义  最终，当请求页面时，./catalog/controller//.php负责整合以上3个文件的逻辑，返回特定的HTML文件。\n然而，奇怪的是，common/home，也就是主页的路由，它的controller文件少了读取本地化翻译的指令，默认情况下无法通过直接修改上述文件完成多语言页面修改，只能通过拓展插件的形式达到目的。\n解决的方法也很简单，在./catalog/controller/common/home.php加入下述代码即可：\n$this-load-language('common/home'); ",
   "wordCount" : "9",
   "inLanguage": "en",
-  "datePublished": "2019-03-26T08:47:11+01:00",
-  "dateModified": "2019-03-26T08:47:11+01:00",
+  "datePublished": "2022-05-14T08:47:11+01:00",
+  "dateModified": "2022-05-14T08:47:11+01:00",
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "https://EnzoLinShx.github.io/posts/murmur_001/"
@@ -185,7 +185,7 @@ $this-&gt;load-&gt;language(&#39;common/home&#39;); "/>
     <h1 class="post-title">
       Murmur 001
     </h1>
-    <div class="post-meta"><span title='2019-03-26 08:47:11 +0100 +0100'>March 26, 2019</span>
+    <div class="post-meta"><span title='2022-05-14 08:47:11 +0100 +0100'>May 14, 2022</span>
 
 </div>
   </header> 
