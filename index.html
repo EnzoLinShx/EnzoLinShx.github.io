@@ -2,7 +2,7 @@
 <html lang="en" dir="auto">
 
 <head>
-	<meta name="generator" content="Hugo 0.98.0" /><meta charset="utf-8">
+	<meta name="generator" content="Hugo 0.99.1" /><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
@@ -126,6 +126,31 @@
 <main class="main"> 
 
 <article class="first-entry"> 
+  <header class="entry-header">
+    <h2>Unicode编码-基础知识
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>基础概念 Unicode是现代计算机文字处理和交换的业界标准，第一版于1991年发布，2021年发布14.0版。标准核心规定了一个编码空间（code space）和码表（code chart），以及字符对应的码点（code point）。每个码点有多个编码方式，Unicode定义了UTF-8、UTF-16和UTF-32三种编码方式。除此之外，由于人类文字的复杂性，Unicode标准还包含判定字符等价、书写方向、拆分标准等内容。
+本文主要介绍Unicode的三种编码方式。
+编码空间 Unicode使用无符号六位十六进制整数作为其编码空间，注意的是其使用的范围是0到10FFFF，而不是到FFFFFF，并没有用到每一个数。
+编码空间被分为17个平面（plane），每个平面包含$16^4$个码点。另外根据文字特征等条件，还会细分成不同区块，每个平面的定义见The Unicode Standard: Core Specification的Detail Allocation一节。
+在表示编码空间内的字符时，通常使用U&#43;作为前缀，码点编码不足4位时，会添加前导零。如大写字母A的编码为U&#43;0041。
+UTF-32 UTF-32是最简单的编码方式，固定宽度编码，使用32个比特编码一个码点。如大写字母A（U&#43;0041），十六进制的41即二进制1000001，U&#43;0041被编码为00000000 00000000 00000000 01000001。
+需要注意的是，32个bit的范围超过Unicode的编码空间，Unicode规定首位必须为0，因此UTF-32可以表示$2^31$个码点，但是实际上Unicode编码空间仅规定了$2^16&#43;2^20$个码点。
+UTF-16 UTF-16是变宽编码，使用1至2位16比特编码，也就是说实际编码长度可能为16比特或32比特。
+对于U&#43;0000到U&#43;D700和U&#43;E000到U&#43;FFFF的字符，直接使用一个16比特表示，如大写字母A即为00000000 01000001。
+U&#43;D800到U&#43;DFFF称之为代理对（surrogate pair），使用两个代理对组合映射到非单个16比特编码可以解决的码位。
+  第一位，称之为高位（high surrogate）或前置位（leading surrogate），范围为U&#43;D800到U&#43;D8FF；
+  第二位，称之为低位（low surrogate）或后置位（trailing surrogate），范围为U&#43;DC00到U&#43;DFFF。
+  高位和低位组成一个编码，映射U&#43;10000到U&#43;10FFFF的码位。
+    DC00 DC01 … DFFF     D800 010000 010001 … 0103FF   D801 010400 010401 … 0107FF   … … … … …   DBFF 10FC00 10FC01 … 10FFFF    如汉字「𡸷」（U&#43;21E37），其编码由代理对U&#43;D847和U&#43;DE37组成，即11011000 01000111 11011110 00110111。...</p>
+  </div>
+  <footer class="entry-footer"><span title='2022-05-29 15:37:03 +0800 CST'>May 29, 2022</span></footer>
+  <a class="entry-link" aria-label="post link to Unicode编码-基础知识" href="https://EnzoLinShx.github.io/posts/unicode_encoding/"></a>
+</article>
+
+<article class="post-entry"> 
   <header class="entry-header">
     <h2>Murmur 001
     </h2>

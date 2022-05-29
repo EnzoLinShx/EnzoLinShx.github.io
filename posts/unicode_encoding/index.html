@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Unicode编码-基础知识 | Ingotte</title>
+<meta name="keywords" content="">
+<meta name="description" content="基础概念 Unicode是现代计算机文字处理和交换的业界标准，第一版于1991年发布，2021年发布14.0版。标准核心规定了一个编码空间（code space）和码表（code chart），以及字符对应的码点（code point）。每个码点有多个编码方式，Unicode定义了UTF-8、UTF-16和UTF-32三种编码方式。除此之外，由于人类文字的复杂性，Unicode标准还包含判定字符等价、书写方向、拆分标准等内容。
+本文主要介绍Unicode的三种编码方式。
+编码空间 Unicode使用无符号六位十六进制整数作为其编码空间，注意的是其使用的范围是0到10FFFF，而不是到FFFFFF，并没有用到每一个数。
+编码空间被分为17个平面（plane），每个平面包含$16^4$个码点。另外根据文字特征等条件，还会细分成不同区块，每个平面的定义见The Unicode Standard: Core Specification的Detail Allocation一节。
+在表示编码空间内的字符时，通常使用U&#43;作为前缀，码点编码不足4位时，会添加前导零。如大写字母A的编码为U&#43;0041。
+UTF-32 UTF-32是最简单的编码方式，固定宽度编码，使用32个比特编码一个码点。如大写字母A（U&#43;0041），十六进制的41即二进制1000001，U&#43;0041被编码为00000000 00000000 00000000 01000001。
+需要注意的是，32个bit的范围超过Unicode的编码空间，Unicode规定首位必须为0，因此UTF-32可以表示$2^31$个码点，但是实际上Unicode编码空间仅规定了$2^16&#43;2^20$个码点。
+UTF-16 UTF-16是变宽编码，使用1至2位16比特编码，也就是说实际编码长度可能为16比特或32比特。
+对于U&#43;0000到U&#43;D700和U&#43;E000到U&#43;FFFF的字符，直接使用一个16比特表示，如大写字母A即为00000000 01000001。
+U&#43;D800到U&#43;DFFF称之为代理对（surrogate pair），使用两个代理对组合映射到非单个16比特编码可以解决的码位。
+  第一位，称之为高位（high surrogate）或前置位（leading surrogate），范围为U&#43;D800到U&#43;D8FF；
+  第二位，称之为低位（low surrogate）或后置位（trailing surrogate），范围为U&#43;DC00到U&#43;DFFF。
+  高位和低位组成一个编码，映射U&#43;10000到U&#43;10FFFF的码位。
+    DC00 DC01 &hellip; DFFF     D800 010000 010001 &hellip; 0103FF   D801 010400 010401 &hellip; 0107FF   &hellip; &hellip; &hellip; &hellip; &hellip;   DBFF 10FC00 10FC01 &hellip; 10FFFF    如汉字「𡸷」（U&#43;21E37），其编码由代理对U&#43;D847和U&#43;DE37组成，即11011000 01000111 11011110 00110111。">
+<meta name="author" content="">
+<link rel="canonical" href="https://EnzoLinShx.github.io/posts/unicode_encoding/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.b4e19c453811e60acfec1f00c15ac2be1c53f6ab90187e684358ce7faaf48bab.css" integrity="sha256-tOGcRTgR5grP7B8AwVrCvhxT9quQGH5oQ1jOf6r0i6s=" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.min.2840b7fccd34145847db71a290569594bdbdb00047097f75d6495d162f5d7dff.js" integrity="sha256-KEC3/M00FFhH23GikFaVlL29sABHCX911kldFi9dff8="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://EnzoLinShx.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://EnzoLinShx.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://EnzoLinShx.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://EnzoLinShx.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://EnzoLinShx.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:title" content="Unicode编码-基础知识" />
+<meta property="og:description" content="基础概念 Unicode是现代计算机文字处理和交换的业界标准，第一版于1991年发布，2021年发布14.0版。标准核心规定了一个编码空间（code space）和码表（code chart），以及字符对应的码点（code point）。每个码点有多个编码方式，Unicode定义了UTF-8、UTF-16和UTF-32三种编码方式。除此之外，由于人类文字的复杂性，Unicode标准还包含判定字符等价、书写方向、拆分标准等内容。
+本文主要介绍Unicode的三种编码方式。
+编码空间 Unicode使用无符号六位十六进制整数作为其编码空间，注意的是其使用的范围是0到10FFFF，而不是到FFFFFF，并没有用到每一个数。
+编码空间被分为17个平面（plane），每个平面包含$16^4$个码点。另外根据文字特征等条件，还会细分成不同区块，每个平面的定义见The Unicode Standard: Core Specification的Detail Allocation一节。
+在表示编码空间内的字符时，通常使用U&#43;作为前缀，码点编码不足4位时，会添加前导零。如大写字母A的编码为U&#43;0041。
+UTF-32 UTF-32是最简单的编码方式，固定宽度编码，使用32个比特编码一个码点。如大写字母A（U&#43;0041），十六进制的41即二进制1000001，U&#43;0041被编码为00000000 00000000 00000000 01000001。
+需要注意的是，32个bit的范围超过Unicode的编码空间，Unicode规定首位必须为0，因此UTF-32可以表示$2^31$个码点，但是实际上Unicode编码空间仅规定了$2^16&#43;2^20$个码点。
+UTF-16 UTF-16是变宽编码，使用1至2位16比特编码，也就是说实际编码长度可能为16比特或32比特。
+对于U&#43;0000到U&#43;D700和U&#43;E000到U&#43;FFFF的字符，直接使用一个16比特表示，如大写字母A即为00000000 01000001。
+U&#43;D800到U&#43;DFFF称之为代理对（surrogate pair），使用两个代理对组合映射到非单个16比特编码可以解决的码位。
+  第一位，称之为高位（high surrogate）或前置位（leading surrogate），范围为U&#43;D800到U&#43;D8FF；
+  第二位，称之为低位（low surrogate）或后置位（trailing surrogate），范围为U&#43;DC00到U&#43;DFFF。
+  高位和低位组成一个编码，映射U&#43;10000到U&#43;10FFFF的码位。
+    DC00 DC01 &hellip; DFFF     D800 010000 010001 &hellip; 0103FF   D801 010400 010401 &hellip; 0107FF   &hellip; &hellip; &hellip; &hellip; &hellip;   DBFF 10FC00 10FC01 &hellip; 10FFFF    如汉字「𡸷」（U&#43;21E37），其编码由代理对U&#43;D847和U&#43;DE37组成，即11011000 01000111 11011110 00110111。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://EnzoLinShx.github.io/posts/unicode_encoding/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-29T15:37:03&#43;08:00" />
+<meta property="article:modified_time" content="2022-05-29T15:37:03&#43;08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Unicode编码-基础知识"/>
+<meta name="twitter:description" content="基础概念 Unicode是现代计算机文字处理和交换的业界标准，第一版于1991年发布，2021年发布14.0版。标准核心规定了一个编码空间（code space）和码表（code chart），以及字符对应的码点（code point）。每个码点有多个编码方式，Unicode定义了UTF-8、UTF-16和UTF-32三种编码方式。除此之外，由于人类文字的复杂性，Unicode标准还包含判定字符等价、书写方向、拆分标准等内容。
+本文主要介绍Unicode的三种编码方式。
+编码空间 Unicode使用无符号六位十六进制整数作为其编码空间，注意的是其使用的范围是0到10FFFF，而不是到FFFFFF，并没有用到每一个数。
+编码空间被分为17个平面（plane），每个平面包含$16^4$个码点。另外根据文字特征等条件，还会细分成不同区块，每个平面的定义见The Unicode Standard: Core Specification的Detail Allocation一节。
+在表示编码空间内的字符时，通常使用U&#43;作为前缀，码点编码不足4位时，会添加前导零。如大写字母A的编码为U&#43;0041。
+UTF-32 UTF-32是最简单的编码方式，固定宽度编码，使用32个比特编码一个码点。如大写字母A（U&#43;0041），十六进制的41即二进制1000001，U&#43;0041被编码为00000000 00000000 00000000 01000001。
+需要注意的是，32个bit的范围超过Unicode的编码空间，Unicode规定首位必须为0，因此UTF-32可以表示$2^31$个码点，但是实际上Unicode编码空间仅规定了$2^16&#43;2^20$个码点。
+UTF-16 UTF-16是变宽编码，使用1至2位16比特编码，也就是说实际编码长度可能为16比特或32比特。
+对于U&#43;0000到U&#43;D700和U&#43;E000到U&#43;FFFF的字符，直接使用一个16比特表示，如大写字母A即为00000000 01000001。
+U&#43;D800到U&#43;DFFF称之为代理对（surrogate pair），使用两个代理对组合映射到非单个16比特编码可以解决的码位。
+  第一位，称之为高位（high surrogate）或前置位（leading surrogate），范围为U&#43;D800到U&#43;D8FF；
+  第二位，称之为低位（low surrogate）或后置位（trailing surrogate），范围为U&#43;DC00到U&#43;DFFF。
+  高位和低位组成一个编码，映射U&#43;10000到U&#43;10FFFF的码位。
+    DC00 DC01 &hellip; DFFF     D800 010000 010001 &hellip; 0103FF   D801 010400 010401 &hellip; 0107FF   &hellip; &hellip; &hellip; &hellip; &hellip;   DBFF 10FC00 10FC01 &hellip; 10FFFF    如汉字「𡸷」（U&#43;21E37），其编码由代理对U&#43;D847和U&#43;DE37组成，即11011000 01000111 11011110 00110111。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://EnzoLinShx.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Unicode编码-基础知识",
+      "item": "https://EnzoLinShx.github.io/posts/unicode_encoding/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Unicode编码-基础知识",
+  "name": "Unicode编码-基础知识",
+  "description": "基础概念 Unicode是现代计算机文字处理和交换的业界标准，第一版于1991年发布，2021年发布14.0版。标准核心规定了一个编码空间（code space）和码表（code chart），以及字符对应的码点（code point）。每个码点有多个编码方式，Unicode定义了UTF-8、UTF-16和UTF-32三种编码方式。除此之外，由于人类文字的复杂性，Unicode标准还包含判定字符等价、书写方向、拆分标准等内容。\n本文主要介绍Unicode的三种编码方式。\n编码空间 Unicode使用无符号六位十六进制整数作为其编码空间，注意的是其使用的范围是0到10FFFF，而不是到FFFFFF，并没有用到每一个数。\n编码空间被分为17个平面（plane），每个平面包含$16^4$个码点。另外根据文字特征等条件，还会细分成不同区块，每个平面的定义见The Unicode Standard: Core Specification的Detail Allocation一节。\n在表示编码空间内的字符时，通常使用U+作为前缀，码点编码不足4位时，会添加前导零。如大写字母A的编码为U+0041。\nUTF-32 UTF-32是最简单的编码方式，固定宽度编码，使用32个比特编码一个码点。如大写字母A（U+0041），十六进制的41即二进制1000001，U+0041被编码为00000000 00000000 00000000 01000001。\n需要注意的是，32个bit的范围超过Unicode的编码空间，Unicode规定首位必须为0，因此UTF-32可以表示$2^31$个码点，但是实际上Unicode编码空间仅规定了$2^16+2^20$个码点。\nUTF-16 UTF-16是变宽编码，使用1至2位16比特编码，也就是说实际编码长度可能为16比特或32比特。\n对于U+0000到U+D700和U+E000到U+FFFF的字符，直接使用一个16比特表示，如大写字母A即为00000000 01000001。\nU+D800到U+DFFF称之为代理对（surrogate pair），使用两个代理对组合映射到非单个16比特编码可以解决的码位。\n  第一位，称之为高位（high surrogate）或前置位（leading surrogate），范围为U+D800到U+D8FF；\n  第二位，称之为低位（low surrogate）或后置位（trailing surrogate），范围为U+DC00到U+DFFF。\n  高位和低位组成一个编码，映射U+10000到U+10FFFF的码位。\n    DC00 DC01 \u0026hellip; DFFF     D800 010000 010001 \u0026hellip; 0103FF   D801 010400 010401 \u0026hellip; 0107FF   \u0026hellip; \u0026hellip; \u0026hellip; \u0026hellip; \u0026hellip;   DBFF 10FC00 10FC01 \u0026hellip; 10FFFF    如汉字「𡸷」（U+21E37），其编码由代理对U+D847和U+DE37组成，即11011000 01000111 11011110 00110111。",
+  "keywords": [
+    
+  ],
+  "articleBody": "基础概念 Unicode是现代计算机文字处理和交换的业界标准，第一版于1991年发布，2021年发布14.0版。标准核心规定了一个编码空间（code space）和码表（code chart），以及字符对应的码点（code point）。每个码点有多个编码方式，Unicode定义了UTF-8、UTF-16和UTF-32三种编码方式。除此之外，由于人类文字的复杂性，Unicode标准还包含判定字符等价、书写方向、拆分标准等内容。\n本文主要介绍Unicode的三种编码方式。\n编码空间 Unicode使用无符号六位十六进制整数作为其编码空间，注意的是其使用的范围是0到10FFFF，而不是到FFFFFF，并没有用到每一个数。\n编码空间被分为17个平面（plane），每个平面包含$16^4$个码点。另外根据文字特征等条件，还会细分成不同区块，每个平面的定义见The Unicode Standard: Core Specification的Detail Allocation一节。\n在表示编码空间内的字符时，通常使用U+作为前缀，码点编码不足4位时，会添加前导零。如大写字母A的编码为U+0041。\nUTF-32 UTF-32是最简单的编码方式，固定宽度编码，使用32个比特编码一个码点。如大写字母A（U+0041），十六进制的41即二进制1000001，U+0041被编码为00000000 00000000 00000000 01000001。\n需要注意的是，32个bit的范围超过Unicode的编码空间，Unicode规定首位必须为0，因此UTF-32可以表示$2^31$个码点，但是实际上Unicode编码空间仅规定了$2^16+2^20$个码点。\nUTF-16 UTF-16是变宽编码，使用1至2位16比特编码，也就是说实际编码长度可能为16比特或32比特。\n对于U+0000到U+D700和U+E000到U+FFFF的字符，直接使用一个16比特表示，如大写字母A即为00000000 01000001。\nU+D800到U+DFFF称之为代理对（surrogate pair），使用两个代理对组合映射到非单个16比特编码可以解决的码位。\n  第一位，称之为高位（high surrogate）或前置位（leading surrogate），范围为U+D800到U+D8FF；\n  第二位，称之为低位（low surrogate）或后置位（trailing surrogate），范围为U+DC00到U+DFFF。\n  高位和低位组成一个编码，映射U+10000到U+10FFFF的码位。\n    DC00 DC01 … DFFF     D800 010000 010001 … 0103FF   D801 010400 010401 … 0107FF   … … … … …   DBFF 10FC00 10FC01 … 10FFFF    如汉字「𡸷」（U+21E37），其编码由代理对U+D847和U+DE37组成，即11011000 01000111 11011110 00110111。\nUTF-8 UTF-8也是一种变宽编码，用1至4位8比特编码，即1至4字节。UTF-8以字节为单位，每个字节的前几个比特用于标记该字节在编码中的位置。\n 字节首位为0，表示该码位仅需一个字节编码。因此UTF-8兼容ASCII，合法的ASCII编码也是合法UTF-8编码； 字节前两位为110，表示该码位需要两个字节编码，这个字节是编码的第一个字节，后续字节开头为10； 字节前两位为1110，表示该码位需要三个字节编码，这个字节是编码的第一个字节，后续字节开头为10；  以此类推。UTF-8理论上最多可以用6个字节编码，这超出了Unicode编码空间，实际仅用4位。\n例子：\n 大写字母A（U+0041），比特长度小于8位，因此只需一个字节编码，即01000001，这同时是合法的ASCII和Unicode编码； 带分音符的大写字母A，即「Ä」（U+00C4），比特长度为8（11000100），加上用于区分位置的标志，需要两个字节编码，最终编码结果为11000011 10000100。  应该使用哪种编码？ 不同编码方式各有其运用场景，编解码和储存的空间取决于多种条件，UTF-16编码后的数据不一定大于UTF-8编码的，取决于编码文本码位范围等条件。如果仅编码ASCII范围内码点，自然是UTF-8成本最低，但是如果编码私有使用平面码位，则UTF-8不占优。另外，还需考虑传输过程和平台的字节序、校验复杂度、平台兼容性等问题。\n一般情况下，建议使用UTF-8编码，现今，超过9成互联网网页均使用UTF-8编码。\n编码之外 很不幸的是，编码仅是文本处理的起点。由于人类文字和文化的复杂性，一个码位并不一定是文化上的一个字符，尽管在本文所用的例子中（「A」、「Ä」、「𡸷」），码位即字符，不同码位组合也可能表示人类认知中的同一个字符，同一个字符也可能有不同表达方式，这些表达方式又有可能对应到同一个码位或不同码位或码位组合。因此判断字符串长度、判断两个字符是否相等、搜索字符串均是一个复杂的问题。\n",
+  "wordCount" : "77",
+  "inLanguage": "en",
+  "datePublished": "2022-05-29T15:37:03+08:00",
+  "dateModified": "2022-05-29T15:37:03+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://EnzoLinShx.github.io/posts/unicode_encoding/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Ingotte",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://EnzoLinShx.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://EnzoLinShx.github.io/" accesskey="h" title="Ingotte (Alt + H)">Ingotte</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </span>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Unicode编码-基础知识
+    </h1>
+    <div class="post-meta"><span title='2022-05-29 15:37:03 +0800 CST'>May 29, 2022</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h2 id="基础概念">基础概念<a hidden class="anchor" aria-hidden="true" href="#基础概念">#</a></h2>
+<p><strong>Unicode</strong>是现代计算机文字处理和交换的业界标准，第一版于1991年发布，2021年发布14.0版。标准核心规定了一个编码空间（code space）和码表（code chart），以及字符对应的码点（code point）。每个码点有多个编码方式，Unicode定义了UTF-8、UTF-16和UTF-32三种编码方式。除此之外，由于人类文字的复杂性，Unicode标准还包含判定字符等价、书写方向、拆分标准等内容。</p>
+<p>本文主要介绍Unicode的三种编码方式。</p>
+<h3 id="编码空间">编码空间<a hidden class="anchor" aria-hidden="true" href="#编码空间">#</a></h3>
+<p>Unicode使用无符号六位十六进制整数作为其编码空间，注意的是其使用的范围是<code>0</code>到<code>10FFFF</code>，而不是到<code>FFFFFF</code>，并没有用到每一个数。</p>
+<p>编码空间被分为17个平面（plane），每个平面包含$16^4$个码点。另外根据文字特征等条件，还会细分成不同区块，每个平面的定义见<em>The Unicode Standard: Core Specification</em>的<em>Detail Allocation</em>一节。</p>
+<p>在表示编码空间内的字符时，通常使用<code>U+</code>作为前缀，码点编码不足4位时，会添加前导零。如大写字母A的编码为<code>U+0041</code>。</p>
+<h2 id="utf-32">UTF-32<a hidden class="anchor" aria-hidden="true" href="#utf-32">#</a></h2>
+<p><strong>UTF-32</strong>是最简单的编码方式，固定宽度编码，使用32个比特编码一个码点。如大写字母A（<code>U+0041</code>），十六进制的<code>41</code>即二进制<code>1000001</code>，<code>U+0041</code>被编码为<code>00000000 00000000 00000000 01000001</code>。</p>
+<p>需要注意的是，32个bit的范围超过Unicode的编码空间，Unicode规定首位必须为<code>0</code>，因此UTF-32可以表示$2^31$个码点，但是实际上Unicode编码空间仅规定了$2^16+2^20$个码点。</p>
+<h2 id="utf-16">UTF-16<a hidden class="anchor" aria-hidden="true" href="#utf-16">#</a></h2>
+<p><strong>UTF-16</strong>是变宽编码，使用1至2位16比特编码，也就是说实际编码长度可能为16比特或32比特。</p>
+<p>对于<code>U+0000</code>到<code>U+D700</code>和<code>U+E000</code>到<code>U+FFFF</code>的字符，直接使用一个16比特表示，如大写字母A即为<code>00000000 01000001</code>。</p>
+<p><code>U+D800</code>到<code>U+DFFF</code>称之为代理对（surrogate pair），使用两个代理对组合映射到非单个16比特编码可以解决的码位。</p>
+<ul>
+<li>
+<p>第一位，称之为高位（high surrogate）或前置位（leading surrogate），范围为<code>U+D800</code>到<code>U+D8FF</code>；</p>
+</li>
+<li>
+<p>第二位，称之为低位（low surrogate）或后置位（trailing surrogate），范围为<code>U+DC00</code>到<code>U+DFFF</code>。</p>
+</li>
+</ul>
+<p>高位和低位组成一个编码，映射<code>U+10000</code>到<code>U+10FFFF</code>的码位。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>DC00</th>
+<th>DC01</th>
+<th>&hellip;</th>
+<th>DFFF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D800</td>
+<td>010000</td>
+<td>010001</td>
+<td>&hellip;</td>
+<td>0103FF</td>
+</tr>
+<tr>
+<td>D801</td>
+<td>010400</td>
+<td>010401</td>
+<td>&hellip;</td>
+<td>0107FF</td>
+</tr>
+<tr>
+<td>&hellip;</td>
+<td>&hellip;</td>
+<td>&hellip;</td>
+<td>&hellip;</td>
+<td>&hellip;</td>
+</tr>
+<tr>
+<td>DBFF</td>
+<td>10FC00</td>
+<td>10FC01</td>
+<td>&hellip;</td>
+<td>10FFFF</td>
+</tr>
+</tbody>
+</table>
+<p>如汉字「𡸷」（<code>U+21E37</code>），其编码由代理对<code>U+D847</code>和<code>U+DE37</code>组成，即<code>11011000 01000111 11011110 00110111</code>。</p>
+<h2 id="utf-8">UTF-8<a hidden class="anchor" aria-hidden="true" href="#utf-8">#</a></h2>
+<p><strong>UTF-8</strong>也是一种变宽编码，用1至4位8比特编码，即1至4字节。UTF-8以字节为单位，每个字节的前几个比特用于标记该字节在编码中的位置。</p>
+<ul>
+<li>字节首位为<code>0</code>，表示该码位仅需一个字节编码。因此UTF-8兼容ASCII，合法的ASCII编码也是合法UTF-8编码；</li>
+<li>字节前两位为<code>110</code>，表示该码位需要两个字节编码，这个字节是编码的第一个字节，后续字节开头为<code>10</code>；</li>
+<li>字节前两位为<code>1110</code>，表示该码位需要三个字节编码，这个字节是编码的第一个字节，后续字节开头为<code>10</code>；</li>
+</ul>
+<p>以此类推。UTF-8理论上最多可以用6个字节编码，这超出了Unicode编码空间，实际仅用4位。</p>
+<p>例子：</p>
+<ul>
+<li>大写字母A（<code>U+0041</code>），比特长度小于8位，因此只需一个字节编码，即<code>01000001</code>，这同时是合法的ASCII和Unicode编码；</li>
+<li>带分音符的大写字母A，即「Ä」（<code>U+00C4</code>），比特长度为8（<code>11000100</code>），加上用于区分位置的标志，需要两个字节编码，最终编码结果为<code>11000011 10000100</code>。</li>
+</ul>
+<h2 id="应该使用哪种编码">应该使用哪种编码？<a hidden class="anchor" aria-hidden="true" href="#应该使用哪种编码">#</a></h2>
+<p>不同编码方式各有其运用场景，编解码和储存的空间取决于多种条件，UTF-16编码后的数据不一定大于UTF-8编码的，取决于编码文本码位范围等条件。如果仅编码ASCII范围内码点，自然是UTF-8成本最低，但是如果编码私有使用平面码位，则UTF-8不占优。另外，还需考虑传输过程和平台的字节序、校验复杂度、平台兼容性等问题。</p>
+<p>一般情况下，建议使用UTF-8编码，现今，超过9成互联网网页均使用UTF-8编码。</p>
+<h2 id="编码之外">编码之外<a hidden class="anchor" aria-hidden="true" href="#编码之外">#</a></h2>
+<p>很不幸的是，编码仅是文本处理的起点。由于人类文字和文化的复杂性，一个码位并不一定是文化上的一个字符，尽管在本文所用的例子中（「A」、「Ä」、「𡸷」），码位即字符，不同码位组合也可能表示人类认知中的同一个字符，同一个字符也可能有不同表达方式，这些表达方式又有可能对应到同一个码位或不同码位或码位组合。因此判断字符串长度、判断两个字符是否相等、搜索字符串均是一个复杂的问题。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+    <span>&copy; 2022 <a href="https://EnzoLinShx.github.io/">Ingotte</a></span>
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
